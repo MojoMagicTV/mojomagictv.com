@@ -22,11 +22,51 @@
   <main class="wrap">
     <h1 class="title"><span class="wordmark" role="img" aria-label="MojoMagicTV"><span class="wordmark__main" aria-hidden="true">MOJO<span class="wordmark__magic">MAGIC</span></span><span class="wordmark__tv" aria-hidden="true">TV</span></span></h1>
     <p class="sub">Coming Soon</p>
+    <!-- Go-live countdown: fixed end = start + 50 days. Do not recompute a rolling 50 days. -->
+    <div class="countdown" id="countdown" role="timer" aria-live="polite" aria-atomic="true"
+         data-start="2026-11-06T00:20:19-05:00"
+         data-end="2026-12-26T00:20:19-05:00">
+      <div class="countdown__unit"><span class="countdown__num" data-part="days">50</span><span class="countdown__label">Days</span></div>
+      <div class="countdown__unit"><span class="countdown__num" data-part="hours">00</span><span class="countdown__label">Hours</span></div>
+      <div class="countdown__unit"><span class="countdown__num" data-part="mins">00</span><span class="countdown__label">Mins</span></div>
+      <div class="countdown__unit"><span class="countdown__num" data-part="secs">00</span><span class="countdown__label">Secs</span></div>
+    </div>
     <nav class="links" aria-label="MojoMagicTV links">
       <a class="btn" href="https://twitch.tv/mojomagictv" target="_blank" rel="noopener">Twitch</a>
       <a class="btn" href="https://www.youtube.com/@MoJoMagicTV" target="_blank" rel="noopener">YouTube</a>
       <a class="btn" href="https://mojo-shop.fourthwall.com" target="_blank" rel="noopener">Merch</a>
     </nav>
   </main>
+  <script>
+  (function () {
+    var root = document.getElementById('countdown');
+    if (!root) return;
+    var endMs = Date.parse(root.getAttribute('data-end'));
+    if (!isFinite(endMs)) return;
+    var daysEl = root.querySelector('[data-part="days"]');
+    var hoursEl = root.querySelector('[data-part="hours"]');
+    var minsEl = root.querySelector('[data-part="mins"]');
+    var secsEl = root.querySelector('[data-part="secs"]');
+    function pad(n) { return n < 10 ? '0' + n : String(n); }
+    function tick() {
+      var left = endMs - Date.now();
+      if (left <= 0) {
+        root.outerHTML = '<p class="countdown__live" role="status">Going live</p>';
+        return;
+      }
+      var totalSec = Math.floor(left / 1000);
+      var days = Math.floor(totalSec / 86400);
+      var hours = Math.floor((totalSec % 86400) / 3600);
+      var mins = Math.floor((totalSec % 3600) / 60);
+      var secs = totalSec % 60;
+      daysEl.textContent = String(days);
+      hoursEl.textContent = pad(hours);
+      minsEl.textContent = pad(mins);
+      secsEl.textContent = pad(secs);
+      setTimeout(tick, 1000);
+    }
+    tick();
+  })();
+  </script>
 </body>
 </html>
