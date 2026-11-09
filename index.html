@@ -11,13 +11,6 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23F2C500'/><text x='16' y='23' font-family='Arial Black,Arial' font-weight='900' font-size='17' text-anchor='middle' fill='%23111'>M</text></svg>" />
 <link rel="preload" href="assets/fonts/bebas-neue-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="assets/style.css" />
-<script>
-try {
-  document.documentElement.classList.add(localStorage.getItem('mojo:zoom') === 'paused' ? 'zoom-paused' : 'zoom-on');
-} catch (e) {
-  document.documentElement.classList.add('zoom-on');
-}
-</script>
 </head>
 <body>
   <!-- V8 keeps its own 16:9 frame. The stage field continues the room past that frame.
@@ -49,9 +42,6 @@ try {
       <div class="countdown__unit"><span class="countdown__num" data-part="hours">00</span><span class="countdown__label">Hrs</span></div>
       <div class="countdown__unit"><span class="countdown__num" data-part="mins">00</span><span class="countdown__label">Min</span></div>
       <div class="countdown__unit"><span class="countdown__num" data-part="secs">00</span><span class="countdown__label">Sec</span></div>
-    </div>
-    <div class="controls">
-      <button type="button" class="btn btn--ghost" data-motion aria-pressed="false">Zoom: on</button>
     </div>
   </div>
   <p class="sr" data-live aria-live="polite"></p>
@@ -92,11 +82,8 @@ try {
     var video = document.querySelector('[data-video]');
     var poster = document.querySelector('[data-poster]');
     var fallback = document.querySelector('[data-fallback]');
-    var motionBtn = document.querySelector('[data-motion]');
     var live = document.querySelector('[data-live]');
-    if (!video || !motionBtn) return;
-    var reduceMq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    function reduced() { return !!(reduceMq && reduceMq.matches); }
+    if (!video) return;
     function say(text) { if (live) live.textContent = text; }
     function showFallback() {
       video.hidden = true;
@@ -122,25 +109,6 @@ try {
     video.addEventListener('error', showFallback);
     if (video.error) showFallback();
     else tryPlay();
-    function paintMotion() {
-      var paused = reduced() || document.documentElement.classList.contains('zoom-paused');
-      motionBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
-      motionBtn.textContent = paused ? 'Zoom: paused' : 'Zoom: on';
-      motionBtn.disabled = reduced();
-      motionBtn.title = reduced() ? 'Zoom stays still because reduced motion is on.' : '';
-    }
-    motionBtn.addEventListener('click', function () {
-      if (reduced()) return;
-      var root = document.documentElement;
-      var paused = !root.classList.contains('zoom-paused');
-      root.classList.toggle('zoom-paused', paused);
-      root.classList.toggle('zoom-on', !paused);
-      try { localStorage.setItem('mojo:zoom', paused ? 'paused' : 'on'); } catch (e) {}
-      paintMotion();
-      say(paused ? 'Zoom paused.' : 'Zoom on.');
-    });
-    if (reduceMq.addEventListener) reduceMq.addEventListener('change', paintMotion);
-    paintMotion();
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) video.pause();
       else if (!video.hidden) tryPlay();
