@@ -207,3 +207,53 @@ body { min-height: 100%; min-height: 100svh; overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .room-stage { animation: none; transform: scale(1); }
 }
+
+/* Privacy link: small corner tab, matches the countdown dock (wood + amber). */
+.privacy-link {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  z-index: 4;
+  padding: 3px 8px 4px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #ffb03a;
+  text-shadow: 0 0 5px rgba(255, 160, 48, .35);
+  background: rgba(26, 18, 12, .82);
+  border: 1px solid rgba(217, 196, 164, .7);
+  box-shadow: 0 4px 10px rgba(42, 24, 10, .16);
+}
+.privacy-link:hover, .privacy-link:focus-visible { color: #ffd27a; outline: none; box-shadow: 0 0 0 2px rgba(255, 176, 58, .55); }
+@media (max-width: 560px) {
+  .privacy-link { bottom: 54px; right: 8px; font-size: 9px; padding: 2px 6px 3px; }
+}
+
+/* Privacy notice page */
+.notice-page { overflow: auto; }
+.notice {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  margin: 96px auto 60px;
+  padding: 18px 20px 16px;
+  border-radius: 12px;
+  color: #f0e2cf;
+  background: linear-gradient(180deg, rgba(232, 206, 164, .14), rgba(92, 58, 32, .25)), #1a120c;
+  border: 1px solid #d9c4a4;
+  box-shadow: 0 10px 24px rgba(42, 24, 10, .22), inset 0 1px 0 rgba(255, 248, 232, .25);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.notice h2 { margin: 0 0 8px; font-family: var(--display); font-weight: 400; font-size: 28px; letter-spacing: .06em; color: #ffb03a; text-shadow: 0 0 6px rgba(255, 160, 48, .45); }
+.notice h3 { margin: 14px 0 4px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #ffd27a; }
+.notice p, .notice ul { margin: 0 0 8px; }
+.notice ul { padding-left: 18px; }
+.notice a { color: #ffb03a; }
+.notice .back { display: inline-block; margin-top: 8px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+.notice .small { font-size: 12px; color: #d5c8b4; }
+@media (max-width: 560px) { .notice { margin: 84px 10px 40px; padding: 14px; font-size: 13.5px; } }
+.notice-page .brand { position: absolute; }
