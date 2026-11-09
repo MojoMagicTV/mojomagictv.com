@@ -20,40 +20,16 @@ try {
 </script>
 </head>
 <body>
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
-    <filter id="crt-bleed" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
-      <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/><feOffset in="r" dx="-1" result="r2"/>
-      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>
-      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/><feOffset in="b" dx="1" result="b2"/>
-      <feBlend in="r2" in2="g" mode="screen" result="rg"/><feBlend in="rg" in2="b2" mode="screen" result="rgb"/>
-      <feGaussianBlur in="rgb" stdDeviation="1.6" result="bloom"/><feBlend in="rgb" in2="bloom" mode="screen"/>
-    </filter>
-  </defs></svg>
-
-  <!-- White-room + CRT stage. Zoom is this whole room, not the countdown or the links.
+  <!-- V8 already shows the white room and CRT. It fills this stage at its own 16:9 frame.
+       Zoom is the whole stage, not the countdown or the links.
        Approximate cycle: 15s in, 15s out, scale 1 to 1.11, ease-in-out. -->
   <div class="room-frame">
     <div class="room-stage" data-stage data-zoom-from="1" data-zoom-to="1.11" data-zoom-leg-ms="15000">
-      <div class="lr">
-        <figure class="tv" aria-label="Retro TV">
-          <div class="tv__body">
-            <div class="tv__screen" data-screen>
-              <img class="tv__poster" data-poster src="media/poster.jpg" alt="" />
-              <video class="tv__video" data-video muted autoplay loop playsinline webkit-playsinline preload="metadata" poster="media/poster.jpg" aria-label="Channel highlight montage">
-                <source src="media/montage_960x720.mp4" type="video/mp4" />
-              </video>
-              <p class="tv__fallback" data-fallback hidden>Preview unavailable</p>
-              <div class="tv__static" aria-hidden="true"></div>
-              <div class="tv__glow" aria-hidden="true"></div>
-              <div class="tv__lines" aria-hidden="true"></div>
-              <div class="tv__glare" aria-hidden="true"></div>
-            </div>
-            <div class="tv__panel" aria-hidden="true"><span class="tv__knob"></span><span class="tv__knob tv__knob--s"></span><span class="tv__grille"></span></div>
-          </div>
-          <div class="tv__feet" aria-hidden="true"><span></span><span></span></div>
-        </figure>
-        <div class="lr__shadow" aria-hidden="true"></div>
-      </div>
+      <img class="scene__poster" data-poster src="media/trailer_v8_poster.jpg" alt="" />
+      <video class="scene__video" data-video muted autoplay loop playsinline webkit-playsinline preload="metadata" poster="media/trailer_v8_poster.jpg" aria-label="MojoMagicTV Twitch trailer">
+        <source src="media/trailer_v8_1080_web_le15.mp4" type="video/mp4" />
+      </video>
+      <p class="scene__fallback" data-fallback hidden>Preview unavailable</p>
     </div>
   </div>
 
@@ -78,7 +54,6 @@ try {
       <a class="btn" href="https://mojo-shop.fourthwall.com" target="_blank" rel="noopener">Merch</a>
     </nav>
     <div class="controls">
-      <button type="button" class="btn btn--ghost" data-sound aria-pressed="false">Sound: off</button>
       <button type="button" class="btn btn--ghost" data-motion aria-pressed="false">Zoom: on</button>
     </div>
   </div>
@@ -120,29 +95,18 @@ try {
     var video = document.querySelector('[data-video]');
     var poster = document.querySelector('[data-poster]');
     var fallback = document.querySelector('[data-fallback]');
-    var screen = document.querySelector('[data-screen]');
-    var soundBtn = document.querySelector('[data-sound]');
     var motionBtn = document.querySelector('[data-motion]');
     var live = document.querySelector('[data-live]');
-    if (!video || !soundBtn || !motionBtn) return;
-    var cuts = [2.8, 5.4, 8.2, 10.8, 13.6, 17.2, 19.6, 22.2, 24.6, 27.2, 29.4, 32.2, 34.4, 36.6, 40.0];
-    var lastT = 0;
-    var glT = 0;
+    if (!video || !motionBtn) return;
     var reduceMq = window.matchMedia('(prefers-reduced-motion: reduce)');
     function reduced() { return !!(reduceMq && reduceMq.matches); }
     function say(text) { if (live) live.textContent = text; }
-    function setSound(on) {
-      video.muted = !on;
-      soundBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      soundBtn.textContent = on ? 'Sound: on' : 'Sound: off';
-      say(on ? 'Sound on.' : 'Sound off.');
-    }
     function showFallback() {
       video.hidden = true;
       video.dataset.state = 'error';
       if (poster) poster.hidden = false;
       if (fallback) fallback.hidden = false;
-      say('Preview image shown. The montage did not play.');
+      say('Preview image shown. The trailer did not play.');
     }
     function tryPlay() {
       var pending = video.play();
@@ -152,30 +116,15 @@ try {
     video.defaultMuted = true;
     video.loop = true;
     video.playsInline = true;
-    setSound(false);
+    video.volume = 0;
     video.addEventListener('playing', function () {
       video.dataset.state = 'playing';
       if (poster) poster.hidden = true;
       if (fallback) fallback.hidden = true;
     });
     video.addEventListener('error', showFallback);
-    video.addEventListener('timeupdate', function () {
-      var t = video.currentTime || 0;
-      if (t + 0.25 < lastT) lastT = 0;
-      if (!reduced() && screen && cuts.some(function (c) { return c > lastT && c <= t; })) {
-        screen.classList.add('is-glitch');
-        clearTimeout(glT);
-        glT = setTimeout(function () { screen.classList.remove('is-glitch'); }, 180);
-      }
-      lastT = t;
-    });
     if (video.error) showFallback();
     else tryPlay();
-    soundBtn.addEventListener('click', function () {
-      var on = video.muted;
-      setSound(on);
-      if (on) tryPlay();
-    });
     function paintMotion() {
       var paused = reduced() || document.documentElement.classList.contains('zoom-paused');
       motionBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
