@@ -4,8 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MojoMagicTV, Coming Soon</title>
-<meta name="description" content="MojoMagicTV's new home on the web is coming soon. Catch the streams on Twitch and YouTube, and grab merch in the meantime." />
-<meta name="theme-color" content="#16181f" />
+<meta name="description" content="MojoMagicTV's new home on the web is coming soon." />
+<meta name="theme-color" content="#f7f6f3" />
 <meta property="og:title" content="MojoMagicTV, Coming Soon" />
 <meta property="og:description" content="MojoMagicTV's new home on the web is coming soon." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23F2C500'/><text x='16' y='23' font-family='Arial Black,Arial' font-weight='900' font-size='17' text-anchor='middle' fill='%23111'>M</text></svg>" />
@@ -13,30 +13,39 @@
 <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <!-- Background: replace assets/bg.webp with the final wallpaper (same filename). -->
-  <picture>
-    <source media="(max-aspect-ratio: 3/4), (max-width: 640px)" srcset="assets/bg_mobile.webp" />
-    <img class="bg" src="assets/bg.webp" alt="" aria-hidden="true" decoding="async" />
-  </picture>
-  <div class="shade" aria-hidden="true"></div>
-  <main class="wrap">
+  <!-- V8 keeps its own 16:9 frame. The stage field continues the room past that frame.
+       Zoom is the whole stage, not the countdown.
+       Approximate cycle: 15s in, 15s out, scale 1 to 1.11, ease-in-out. -->
+  <div class="room-frame">
+    <div class="room-stage" data-stage data-zoom-from="1" data-zoom-to="1.11" data-zoom-leg-ms="15000">
+      <div class="scene">
+        <img class="scene__poster" data-poster src="media/trailer_v8_poster.jpg" alt="" />
+        <video class="scene__video" data-video muted autoplay loop playsinline webkit-playsinline preload="metadata" poster="media/trailer_v8_poster.jpg" aria-label="MojoMagicTV Twitch trailer">
+          <source src="media/trailer_v8_1080_web_le15.mp4" type="video/mp4" />
+        </video>
+        <p class="scene__fallback" data-fallback hidden>Preview unavailable</p>
+      </div>
+    </div>
+  </div>
+
+  <header class="brand">
     <h1 class="title"><span class="wordmark" role="img" aria-label="MojoMagicTV"><span class="wordmark__main" aria-hidden="true">MOJO<span class="wordmark__magic">MAGIC</span></span><span class="wordmark__tv" aria-hidden="true">TV</span></span></h1>
     <p class="sub">Coming Soon</p>
+  </header>
+
+  <div class="dock">
     <!-- Go-live countdown: fixed end = Dec 19, 2026 6:00 PM EST (2026-12-19T23:00:00Z). Not rolling. -->
     <div class="countdown" id="countdown" role="timer" aria-live="polite" aria-atomic="true"
          data-start="2026-11-06T00:20:19-05:00"
          data-end="2026-12-19T18:00:00-05:00">
       <div class="countdown__unit"><span class="countdown__num" data-part="days">50</span><span class="countdown__label">Days</span></div>
-      <div class="countdown__unit"><span class="countdown__num" data-part="hours">00</span><span class="countdown__label">Hours</span></div>
-      <div class="countdown__unit"><span class="countdown__num" data-part="mins">00</span><span class="countdown__label">Mins</span></div>
-      <div class="countdown__unit"><span class="countdown__num" data-part="secs">00</span><span class="countdown__label">Secs</span></div>
+      <div class="countdown__unit"><span class="countdown__num" data-part="hours">00</span><span class="countdown__label">Hrs</span></div>
+      <div class="countdown__unit"><span class="countdown__num" data-part="mins">00</span><span class="countdown__label">Min</span></div>
+      <div class="countdown__unit"><span class="countdown__num" data-part="secs">00</span><span class="countdown__label">Sec</span></div>
     </div>
-    <nav class="links" aria-label="MojoMagicTV links">
-      <a class="btn" href="https://twitch.tv/mojomagictv" target="_blank" rel="noopener">Twitch</a>
-      <a class="btn" href="https://www.youtube.com/@MoJoMagicTV" target="_blank" rel="noopener">YouTube</a>
-      <a class="btn" href="https://mojo-shop.fourthwall.com" target="_blank" rel="noopener">Merch</a>
-    </nav>
-  </main>
+  </div>
+  <p class="sr" data-live aria-live="polite"></p>
+
   <script>
   (function () {
     var root = document.getElementById('countdown');
@@ -66,6 +75,44 @@
       setTimeout(tick, 1000);
     }
     tick();
+  })();
+  </script>
+  <script>
+  (function () {
+    var video = document.querySelector('[data-video]');
+    var poster = document.querySelector('[data-poster]');
+    var fallback = document.querySelector('[data-fallback]');
+    var live = document.querySelector('[data-live]');
+    if (!video) return;
+    function say(text) { if (live) live.textContent = text; }
+    function showFallback() {
+      video.hidden = true;
+      video.dataset.state = 'error';
+      if (poster) poster.hidden = false;
+      if (fallback) fallback.hidden = false;
+      say('Preview image shown. The trailer did not play.');
+    }
+    function tryPlay() {
+      var pending = video.play();
+      if (pending && pending.catch) pending.catch(function () {});
+    }
+    video.muted = true;
+    video.defaultMuted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.volume = 0;
+    video.addEventListener('playing', function () {
+      video.dataset.state = 'playing';
+      if (poster) poster.hidden = true;
+      if (fallback) fallback.hidden = true;
+    });
+    video.addEventListener('error', showFallback);
+    if (video.error) showFallback();
+    else tryPlay();
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) video.pause();
+      else if (!video.hidden) tryPlay();
+    });
   })();
   </script>
 </body>
