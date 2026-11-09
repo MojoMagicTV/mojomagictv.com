@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>MojoMagicTV, Coming Soon</title>
-<meta name="description" content="MojoMagicTV's new home on the web is coming soon. Catch the streams on Twitch and YouTube, and grab merch in the meantime." />
+<meta name="description" content="MojoMagicTV's new home on the web is coming soon." />
 <meta name="theme-color" content="#f7f6f3" />
 <meta property="og:title" content="MojoMagicTV, Coming Soon" />
 <meta property="og:description" content="MojoMagicTV's new home on the web is coming soon." />
@@ -20,16 +20,18 @@ try {
 </script>
 </head>
 <body>
-  <!-- V8 already shows the white room and CRT. It fills this stage at its own 16:9 frame.
-       Zoom is the whole stage, not the countdown or the links.
+  <!-- V8 keeps its own 16:9 frame. The stage field continues the room past that frame.
+       Zoom is the whole stage, not the countdown.
        Approximate cycle: 15s in, 15s out, scale 1 to 1.11, ease-in-out. -->
   <div class="room-frame">
     <div class="room-stage" data-stage data-zoom-from="1" data-zoom-to="1.11" data-zoom-leg-ms="15000">
-      <img class="scene__poster" data-poster src="media/trailer_v8_poster.jpg" alt="" />
-      <video class="scene__video" data-video muted autoplay loop playsinline webkit-playsinline preload="metadata" poster="media/trailer_v8_poster.jpg" aria-label="MojoMagicTV Twitch trailer">
-        <source src="media/trailer_v8_1080_web_le15.mp4" type="video/mp4" />
-      </video>
-      <p class="scene__fallback" data-fallback hidden>Preview unavailable</p>
+      <div class="scene">
+        <img class="scene__poster" data-poster src="media/trailer_v8_poster.jpg" alt="" />
+        <video class="scene__video" data-video muted autoplay loop playsinline webkit-playsinline preload="metadata" poster="media/trailer_v8_poster.jpg" aria-label="MojoMagicTV Twitch trailer">
+          <source src="media/trailer_v8_1080_web_le15.mp4" type="video/mp4" />
+        </video>
+        <p class="scene__fallback" data-fallback hidden>Preview unavailable</p>
+      </div>
     </div>
   </div>
 
@@ -48,11 +50,6 @@ try {
       <div class="countdown__unit"><span class="countdown__num" data-part="mins">00</span><span class="countdown__label">Min</span></div>
       <div class="countdown__unit"><span class="countdown__num" data-part="secs">00</span><span class="countdown__label">Sec</span></div>
     </div>
-    <nav class="links" aria-label="MojoMagicTV links">
-      <a class="btn" href="https://twitch.tv/mojomagictv" target="_blank" rel="noopener">Twitch</a>
-      <a class="btn" href="https://www.youtube.com/@MoJoMagicTV" target="_blank" rel="noopener">YouTube</a>
-      <a class="btn" href="https://mojo-shop.fourthwall.com" target="_blank" rel="noopener">Merch</a>
-    </nav>
     <div class="controls">
       <button type="button" class="btn btn--ghost" data-motion aria-pressed="false">Zoom: on</button>
     </div>
