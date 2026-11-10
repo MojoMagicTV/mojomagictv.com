@@ -16,14 +16,14 @@
   <!-- V8 keeps its own 16:9 frame. The stage field continues the room past that frame.
        Zoom is the whole stage, not the countdown.
        Cycle: 15s (7.5s in, 7.5s out), 4 cycles per 60s video, scale 1 to 1.11, cosine ease-in-out.
-       Phase-locked to video.currentTime (JS below) so the zoom is at scale 1 at the video start and at its loop end.
+       Phase-locked to video.currentTime (JS below): 3 zoom cycles of 17s over 0-51s, then it rests at scale 1 while the video's camera glides back to its opening framing, so the zoom is 1 at the video start and at its loop end.
        CSS animation (7.5s legs) is only the fallback when JS is off. -->
   <div class="room-frame">
-    <div class="room-stage" data-stage data-zoom-from="1" data-zoom-to="1.11" data-zoom-cycle-ms="15000" data-video-ms="60000">
+    <div class="room-stage" data-stage data-zoom-from="1" data-zoom-to="1.11" data-zoom-cycle-ms="17000" data-zoom-active-ms="51000" data-video-ms="60000">
       <div class="scene">
         <img class="scene__poster" data-poster src="media/trailer_v9_crt_poster.jpg" alt="" />
         <video class="scene__video" data-video muted autoplay loop playsinline webkit-playsinline preload="metadata" poster="media/trailer_v9_crt_poster.jpg" aria-label="MojoMagicTV Twitch trailer">
-          <source src="media/trailer_v9b_crt_1080_web.mp4" type="video/mp4" />
+          <source src="media/trailer_v9d_crt_1080_web.mp4" type="video/mp4" />
         </video>
         <p class="scene__fallback" data-fallback hidden>Preview unavailable</p>
       </div>
@@ -127,6 +127,7 @@
     var from = parseFloat(stage.getAttribute('data-zoom-from')) || 1;
     var to = parseFloat(stage.getAttribute('data-zoom-to')) || 1.11;
     var cycle = (parseFloat(stage.getAttribute('data-zoom-cycle-ms')) || 15000) / 1000;
+    var active = (parseFloat(stage.getAttribute('data-zoom-active-ms')) || 0) / 1000;  // zoom rests at scale 1 after this (the video's own camera return runs then)
     var total = (parseFloat(stage.getAttribute('data-video-ms')) || 60000) / 1000;
     stage.setAttribute('data-zoom-sync', '');
     var lastT = 0, anchor = null, started = false, t0 = performance.now();
@@ -145,7 +146,8 @@
       return ((performance.now() - anchor) / 1000) % total;
     }
     function frame() {
-      var t = clock() % cycle;
+      var c = clock();
+      var t = (active > 0 && c >= active) ? 0 : c % cycle;
       var k = 0.5 - 0.5 * Math.cos(2 * Math.PI * t / cycle);
       stage.style.transform = 'scale(' + (from + (to - from) * k).toFixed(5) + ')';
       window.requestAnimationFrame(frame);
