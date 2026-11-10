@@ -11,7 +11,7 @@
   --dock: rgba(16, 17, 20, .92);
   --zoom-from: 1;
   --zoom-to: 1.11;
-  --zoom-leg: 15s;
+  --zoom-leg: 7.5s;
 }
 
 * { box-sizing: border-box; }
@@ -78,6 +78,8 @@ body { min-height: 100%; min-height: 100svh; overflow: hidden; }
   letter-spacing: .08em;
   text-transform: uppercase;
 }
+/* JS phase-locks the zoom to the video clock and sets transform inline; this animation is the no-JS fallback. */
+.room-stage[data-zoom-sync] { animation: none; }
 @keyframes room-zoom {
   from { transform: scale(var(--zoom-from)); }
   to { transform: scale(var(--zoom-to)); }
