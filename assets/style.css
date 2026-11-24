@@ -259,3 +259,61 @@ body { min-height: 100%; min-height: 100svh; overflow: hidden; }
 .notice .small { font-size: 12px; color: #d5c8b4; }
 @media (max-width: 560px) { .notice { margin: 84px 10px 40px; padding: 14px; font-size: 13.5px; } }
 .notice-page .brand { position: absolute; }
+
+
+/* Social links: muted icon row. Desktop sits bottom-left, clear of the countdown
+   dock and the Privacy tab. Narrow screens move the row up, centered, so it
+   does not cover the TV, the countdown, or Privacy. */
+.socials {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 4;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+}
+.socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  color: #5c5c58;
+  text-decoration: none;
+}
+.socials a:hover,
+.socials a:focus-visible {
+  color: #1c1c1e;
+  background: rgba(28, 28, 30, .06);
+  outline: none;
+}
+.socials a:focus-visible {
+  box-shadow: 0 0 0 2px rgba(28, 28, 30, .35);
+}
+.socials svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  fill: currentColor;
+}
+@media (max-width: 900px) {
+  .socials {
+    left: 50%;
+    bottom: 58px;
+    transform: translateX(-50%);
+    justify-content: center;
+    max-width: calc(100% - 16px);
+  }
+}
+@media (max-width: 560px) {
+  .socials { bottom: 84px; }
+}
+@media (max-width: 390px) {
+  .socials { bottom: 80px; }
+  .socials a { width: 28px; height: 28px; }
+}
